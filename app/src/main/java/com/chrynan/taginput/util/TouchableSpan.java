@@ -33,42 +33,6 @@ public abstract class TouchableSpan extends CharacterStyle implements UpdateAppe
 
     public abstract boolean onTouch(View widget, MotionEvent event, String text);
 
-    public boolean wasCancelled(TextView parentView, MotionEvent event){
-        if(tagTextView != null && parentView != null && event != null){
-            final int DRAWABLE_RIGHT = 2; //drawable right is what we really want
-            int x = getXOffset(parentView, event);
-            int drawableWidth = tagTextView.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width();
-            int textViewWidth = getTextViewWidth(tagTextView);
-            if(x > 0 && drawableWidth > 0 && textViewWidth > 0) {
-
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (event.getRawX() >= (tagTextView.getRight() - tagTextView.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private int getTextViewWidth(TextView textView){
-        if(textView != null){
-            textView.measure(0, 0);
-            textView.getMeasuredWidth();
-        }
-        return -1;
-    }
-
-    private int getXOffset(TextView textView, MotionEvent event){
-        if(event != null && textView != null){
-            int x = (int) event.getX();
-            x -= textView.getTotalPaddingLeft();
-            x += textView.getScrollX();
-            return x;
-        }
-        return -1;
-    }
-
     public String getText() {
         return text;
     }

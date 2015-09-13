@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TagInput">
+        <attr name="tagTextSize" format="integer" />
+        <attr name="tagBackground" format="integer" />
+        <attr name="tagCancelButton" format="integer" />
+        <attr name="tagTextColor" format="integer" />
+        <attr name="tagCancelColor" format="integer" />
+    </declare-styleable>
+</resources>

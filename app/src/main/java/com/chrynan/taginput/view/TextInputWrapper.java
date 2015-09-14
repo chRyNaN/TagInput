@@ -13,7 +13,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 /**
- * Created by byowa_000 on 9/14/2015.
+ * Created by chrynan on 9/14/2015.
+ * Make sure to specify the textColorHint and the ellipsize="end"
  * Needed because of bug:
  * https://code.google.com/p/android/issues/detail?id=175228
  * Fix ideas found here:

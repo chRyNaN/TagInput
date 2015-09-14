@@ -63,7 +63,6 @@ public class TagInput extends AppCompatAutoCompleteTextView {
 
     public TagInput(Context context) {
         super(context);
-        Log.d(TAG, "TagInput constructor");
         this.context = context;
         this.sb = new StringBuilder();
         this.spannableStringBuilder = new SpannableStringBuilder();
@@ -83,7 +82,6 @@ public class TagInput extends AppCompatAutoCompleteTextView {
 
     public TagInput(Context context, AttributeSet attrs) {
         super(context, attrs);
-        Log.d(TAG, "TagInput constructor");
         this.context = context;
         this.sb = new StringBuilder();
         this.spannableStringBuilder = new SpannableStringBuilder();
@@ -100,7 +98,6 @@ public class TagInput extends AppCompatAutoCompleteTextView {
 
     public TagInput(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        Log.d(TAG, "TagInput constructor");
         this.context = context;
         this.sb = new StringBuilder();
         this.spannableStringBuilder = new SpannableStringBuilder();
@@ -118,7 +115,6 @@ public class TagInput extends AppCompatAutoCompleteTextView {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public TagInput(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr);
-        Log.d(TAG, "TagInput constructor");
         this.context = context;
         this.sb = new StringBuilder();
         this.spannableStringBuilder = new SpannableStringBuilder();
@@ -134,7 +130,6 @@ public class TagInput extends AppCompatAutoCompleteTextView {
     }
 
     private void initAttributeSet(AttributeSet attrs){
-        Log.d(TAG, "iniAttributeSet");
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TagInput, 0, 0);
         try{
             this.tagTextSize = a.getInt(R.styleable.TagInput_tagTextSize, 18);
@@ -158,19 +153,15 @@ public class TagInput extends AppCompatAutoCompleteTextView {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try {
-                    Log.d(TAG, "lastStart = " + lastStart + "; s = " + s + "; start = " + start + "; before = " + before + "; count = " + count);
                     if (!internalChange) {
                         String e = s.subSequence(lastStart, start + count).toString();
                         int i = e.indexOf(System.getProperty("line.separator"));
                         if (i == -1) { //enter button was NOT pressed
                             addTag = false;
                         } else { //enter button was pressed; so add tag
-                            Log.d(TAG, "i = " + i + "; e = " + e);
-                            Log.d(TAG, "e.replace = " + e.replace(System.getProperty("line.separator"), ""));
                             //String Builder is used for temporary text before it is added as a tag
                             //needed for afterTextChanged call
                             sb.append(e.replace(System.getProperty("line.separator"), ""));
-                            Log.d(TAG, "sb = " + sb.toString());
                             addTag = true;
                         }
                         //to prevent duplicate of the same deletes
@@ -186,7 +177,6 @@ public class TagInput extends AppCompatAutoCompleteTextView {
             @Override
             public void afterTextChanged(Editable s) {
                 if (!internalChange && addTag) {
-                    Log.d(TAG, "afterTextChanged: not an internal change and addTag is true: sb = " + sb.toString());
                     addTag(sb.toString());
                 } else if (internalChange) {
                     internalChange = false; //internal change was finished so set back to false
@@ -219,7 +209,6 @@ public class TagInput extends AppCompatAutoCompleteTextView {
 
     @Override
     public void setSelection(int index){
-        Log.d(TAG, "setSelection: index = " + index + " lastStart = " + lastStart);
         //attempt to prevent user from selecting tags and inserting text before and between tags
         index = (index < lastStart) ? lastStart : index;
         index = (index > getText().length()) ? getText().length() : index;
@@ -228,7 +217,6 @@ public class TagInput extends AppCompatAutoCompleteTextView {
 
     @Override
     public void setSelection(int start, int stop){
-        Log.d(TAG, "setSelection: start = " + start + " stop = " + stop + " lastStart = " + lastStart);
         //attempt to prevent user from selecting tags and inserting text before and between tags
         if(start < lastStart){
             if((lastStart + stop) > getText().length()){
@@ -400,20 +388,16 @@ public class TagInput extends AppCompatAutoCompleteTextView {
     }
 
     public void addTag(String text){
-        Log.d(TAG, "addTag: text = " + text);
         try{
             if(isNotBlank(text)) {
                 text = text.trim();
                 if(tags.contains(text)){
                     return;
                 }
-                Log.d(TAG, "addTag: after trim called: text = " + text);
-                Log.d(TAG, "addTag: text is not empty");
                 TextView tv = createTagTextView(text);
                 Bitmap b = converViewToBitmap(tv);
                 BitmapDrawable bd = new BitmapDrawable(context.getResources(), b);
                 bd.setBounds(0, 0, b.getWidth(), b.getHeight());
-                Log.d(TAG, "addTag: spannableStringBuilder before append = " + spannableStringBuilder.toString());
                 spannableStringBuilder.append(text + " ");
                 final ImageSpan imageSpan = new ImageSpan(bd);
                 spannableStringBuilder.setSpan(imageSpan, spannableStringBuilder.length() - (text.length() + 1),
@@ -428,12 +412,9 @@ public class TagInput extends AppCompatAutoCompleteTextView {
                     @Override
                     public boolean onTouch(View widget, MotionEvent event, String t) {
                         if(t != null){
-                            Log.d(TAG, "onTouch: text = " + t);
                             if(cancelPressed(imageSpan, this.getTagTextView(), event)){
-                                Log.d(TAG, "Cancel button was pressed.");
                                 removeTag(t);
                             }else {
-                                Log.d(TAG, "Tag was selected.");
                                 alertListenersTagSelected(t);
                             }
                         }
@@ -442,12 +423,10 @@ public class TagInput extends AppCompatAutoCompleteTextView {
                 }, spannableStringBuilder.length() - (text.length() + 1), spannableStringBuilder.length() - 1,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 spannableStringBuilder.append(" "); //seems to fix a bug with the deleteSurroundingText() method
-                Log.d(TAG, "addTag: spannableStringBuilder after append = " + spannableStringBuilder.toString());
                 tags.add(text);
                 alertListenersTagAdded(text);
                 setTagText();
             } else {
-                Log.d(TAG, "addTag: input is blank: set back to spannableStringBuilder text");
                 //remove the blank space or enter key added
                 setTagText();
             }
@@ -491,10 +470,8 @@ public class TagInput extends AppCompatAutoCompleteTextView {
             */
 
             //remove the tag from the tags list
-            Log.d(TAG, "removeTag: text = " + text + "; tags = " + tags.toString());
             List<String> oldTags = new ArrayList<>(tags);
             boolean removed = oldTags.remove(text);
-            Log.d(TAG, "removeTag: removed = " + removed);
             if(removed){
                 //if the tag was in the tags list and was successfully removed, clear the SpannableStringBuilder
                 clearText();
@@ -520,7 +497,6 @@ public class TagInput extends AppCompatAutoCompleteTextView {
     }
 
     private boolean cancelPressed(ImageSpan imageSpan, TextView textView, MotionEvent event){
-        Log.d(TAG, "cancelPressed: imageSpan = " + imageSpan + "; textView = " + textView + "; event = " + event);
         //TODO get this method to work correctly
         if(textView != null && imageSpan != null && event != null){
             Rect bounds = imageSpan.getDrawable().getBounds();
@@ -625,7 +601,7 @@ public class TagInput extends AppCompatAutoCompleteTextView {
             view.destroyDrawingCache();
             return new BitmapDrawable(viewBmp);
         }catch(Exception e){
-            Log.d(TAG, "Error creating Drawable from View:");
+            Log.e(TAG, "Error creating Drawable from View:");
             e.printStackTrace();
             return null;
         }
@@ -747,15 +723,12 @@ public class TagInput extends AppCompatAutoCompleteTextView {
 
         @Override
         public boolean sendKeyEvent(KeyEvent event) {
-            Log.d(TAG, "sendKeyEvent");
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-                Log.d(TAG, "sendKeyEvent: backspace pressed");
                 // Un-comment if you wish to cancel the backspace:
                 // return false;
                 int start = TagInput.this.getSelectionStart();
                 int end = TagInput.this.getSelectionEnd();
                 int length = spannableStringBuilder.length();
-                Log.d(TAG, "backspace: start = " + start + "; end = " + end + "; length = " + length);
                 if(lastDeleteIndex == start){
                     //prevent duplicate calls to sendKeyEvent
                     //lastDeleteIndex will equal -1 if any change happened after a delete
@@ -765,7 +738,6 @@ public class TagInput extends AppCompatAutoCompleteTextView {
                     return false;
                 }
                 if(start == length || start == length - 1){
-                    Log.d(TAG, "backspace");
                     //delete the previous tag
                     if(tags.size() > 0) { //make sure there's tags to delete
                         removeTag(tags.get(tags.size() - 1));
@@ -785,13 +757,11 @@ public class TagInput extends AppCompatAutoCompleteTextView {
                     }
                 }
             }
-            Log.d(TAG, "super.sendKeyEvent");
             return super.sendKeyEvent(event);
         }
 
         @Override
         public boolean deleteSurroundingText(int beforeLength, int afterLength) {
-            Log.d(TAG, "deleteSurroundingText: beforeLength = " + beforeLength + "; afterLength = " + afterLength);
             // magic: in latest Android, deleteSurroundingText(1, 0) will be called for backspace
             if (beforeLength == 1 && afterLength == 0) {
                 // backspace

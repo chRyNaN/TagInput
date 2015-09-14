@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by chrynan on 9/11/2015.
+ * Created by byowa_000 on 9/11/2015.
  * Some ideas used from the questions and answers at: http://stackoverflow.com/questions/10812316/contact-bubble-edittext
  */
 public class TagInput extends AppCompatAutoCompleteTextView {
@@ -59,6 +59,7 @@ public class TagInput extends AppCompatAutoCompleteTextView {
     private int tagTextColor;
     private List<OnTagListener> listeners;
     private List<AdapterView.OnItemSelectedListener> dropDownListeners;
+    private List<OnTypeListener> typeListeners;
 
     public TagInput(Context context) {
         super(context);
@@ -72,7 +73,8 @@ public class TagInput extends AppCompatAutoCompleteTextView {
         this.tagCancelButtonResource = R.drawable.tag_input_cancel_button;
         this.tagTextColor = R.color.white;
         this.listeners = new ArrayList<>();
-        dropDownListeners = new ArrayList<>();
+        this.dropDownListeners = new ArrayList<>();
+        this.typeListeners = new ArrayList<>();
         this.setMovementMethod(new LinkTouchMovementMethod());
         initTextWatcher();
         initOnItemSelectedListener();
@@ -87,7 +89,8 @@ public class TagInput extends AppCompatAutoCompleteTextView {
         this.spannableStringBuilder = new SpannableStringBuilder();
         this.tags = new ArrayList<>();
         this.listeners = new ArrayList<>();
-        dropDownListeners = new ArrayList<>();
+        this.dropDownListeners = new ArrayList<>();
+        this.typeListeners = new ArrayList<>();
         this.setMovementMethod(new LinkTouchMovementMethod());
         initAttributeSet(attrs);
         initTextWatcher();
@@ -103,7 +106,8 @@ public class TagInput extends AppCompatAutoCompleteTextView {
         this.spannableStringBuilder = new SpannableStringBuilder();
         this.tags = new ArrayList<>();
         this.listeners = new ArrayList<>();
-        dropDownListeners = new ArrayList<>();
+        this.dropDownListeners = new ArrayList<>();
+        this.typeListeners = new ArrayList<>();
         this.setMovementMethod(new LinkTouchMovementMethod());
         initAttributeSet(attrs);
         initTextWatcher();
@@ -120,7 +124,8 @@ public class TagInput extends AppCompatAutoCompleteTextView {
         this.spannableStringBuilder = new SpannableStringBuilder();
         this.tags = new ArrayList<>();
         this.listeners = new ArrayList<>();
-        dropDownListeners = new ArrayList<>();
+        this.dropDownListeners = new ArrayList<>();
+        this.typeListeners = new ArrayList<>();
         this.setMovementMethod(new LinkTouchMovementMethod());
         initAttributeSet(attrs);
         initTextWatcher();
@@ -171,6 +176,7 @@ public class TagInput extends AppCompatAutoCompleteTextView {
                         //to prevent duplicate of the same deletes
                         //index is set back to -1 if any other change was made other than a delete
                         lastDeleteIndex = -1;
+                        alertTypeListeners(s.toString(), sb.toString());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -413,7 +419,7 @@ public class TagInput extends AppCompatAutoCompleteTextView {
                 spannableStringBuilder.setSpan(imageSpan, spannableStringBuilder.length() - (text.length() + 1),
                         spannableStringBuilder.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 //add touchable span to handle touch events
-                spannableStringBuilder.setSpan(new TouchableSpan(text) {
+                spannableStringBuilder.setSpan(new TouchableSpan(text, tv) {
                     @Override
                     public void updateDrawState(TextPaint tp) {
                         tp.setUnderlineText(false);
@@ -424,8 +430,10 @@ public class TagInput extends AppCompatAutoCompleteTextView {
                         if(t != null){
                             Log.d(TAG, "onTouch: text = " + t);
                             if(cancelPressed(imageSpan, this.getTagTextView(), event)){
+                                Log.d(TAG, "Cancel button was pressed.");
                                 removeTag(t);
                             }else {
+                                Log.d(TAG, "Tag was selected.");
                                 alertListenersTagSelected(t);
                             }
                         }
@@ -664,7 +672,9 @@ public class TagInput extends AppCompatAutoCompleteTextView {
 
 
     public void addTagListener(OnTagListener listener){
-        listeners.add(listener);
+        if(listener != null) {
+            listeners.add(listener);
+        }
     }
 
     public void removeTagListener(OnTagListener listener){
@@ -686,6 +696,29 @@ public class TagInput extends AppCompatAutoCompleteTextView {
     private void alertListenersTagAdded(String tagText){
         for(OnTagListener l : listeners){
             l.onTagAdded(tagText);
+        }
+    }
+
+
+    //convenience interface for when the user types
+    public static interface OnTypeListener{
+        void onType(String entireText, String currentText);
+    }
+
+
+    public void addOnTypeListener(OnTypeListener listener){
+        if(listener != null) {
+            this.typeListeners.add(listener);
+        }
+    }
+
+    public boolean removeTypeListener(OnTypeListener listener){
+        return this.typeListeners.remove(listener);
+    }
+
+    private void alertTypeListeners(String entireText, String currentText){
+        for(OnTypeListener l : typeListeners){
+            l.onType(entireText, currentText);
         }
     }
 

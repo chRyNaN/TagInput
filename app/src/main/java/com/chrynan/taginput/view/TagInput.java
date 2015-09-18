@@ -50,6 +50,7 @@ public class TagInput extends AppCompatAutoCompleteTextView {
     private List<String> tags;
     private boolean addTag = false;
     private boolean internalChange = false;
+    private boolean cancelable = false;
     private int lastStart = 0;
     private int lastDeleteIndex = -1;
     private int tagTextSize;
@@ -498,6 +499,9 @@ public class TagInput extends AppCompatAutoCompleteTextView {
 
     private boolean cancelPressed(ImageSpan imageSpan, TextView textView, MotionEvent event){
         //TODO get this method to work correctly
+        if(!cancelable){
+            return false;
+        }
         if(textView != null && imageSpan != null && event != null){
             Rect bounds = imageSpan.getDrawable().getBounds();
             int left = bounds.left;
@@ -545,12 +549,14 @@ public class TagInput extends AppCompatAutoCompleteTextView {
             tv.setTextSize(tagTextSize);
             tv.setTextColor(context.getResources().getColor(tagTextColor));
             tv.setBackgroundResource(tagBackground);
-            int drawableSize = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, tagTextSize / 2,
-                                                            context.getResources().getDisplayMetrics()));
-            Drawable d = (tagCancelButton == null) ? context.getResources().getDrawable(tagCancelButtonResource) : tagCancelButton;
-            Bitmap cb = ((BitmapDrawable) d).getBitmap();
-            d = new BitmapDrawable(context.getResources(), Bitmap.createScaledBitmap(cb, drawableSize, drawableSize, true));
-            tv.setCompoundDrawablesWithIntrinsicBounds(null, null, d, null);
+            if(cancelable) {
+                int drawableSize = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, tagTextSize / 2,
+                        context.getResources().getDisplayMetrics()));
+                Drawable d = (tagCancelButton == null) ? context.getResources().getDrawable(tagCancelButtonResource) : tagCancelButton;
+                Bitmap cb = ((BitmapDrawable) d).getBitmap();
+                d = new BitmapDrawable(context.getResources(), Bitmap.createScaledBitmap(cb, drawableSize, drawableSize, true));
+                tv.setCompoundDrawablesWithIntrinsicBounds(null, null, d, null);
+            }
             int p = (tagTextSize > 12) ? tagTextSize / 2 : 6;
             p = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, p, context.getResources().getDisplayMetrics()));
             tv.setPadding(p, p, p, p);
@@ -605,6 +611,14 @@ public class TagInput extends AppCompatAutoCompleteTextView {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public boolean isCancelable(){
+        return this.cancelable;
+    }
+
+    public void setCancelable(boolean cancel){
+        this.cancelable = cancel;
     }
 
     public int getTagTextSize(){
